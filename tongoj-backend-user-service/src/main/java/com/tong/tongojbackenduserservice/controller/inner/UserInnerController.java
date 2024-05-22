@@ -27,7 +27,7 @@ public class UserInnerController implements UserFeignClient {
 
     @Override
     @GetMapping("/get/ids")
-    public List<User> listByIds(@RequestParam("userIds") Collection<Long> ids) {
+    public List<User> listByIds(@RequestParam("ids") Collection<Long> ids) {
         return userService.listByIds(ids);
     }
 
