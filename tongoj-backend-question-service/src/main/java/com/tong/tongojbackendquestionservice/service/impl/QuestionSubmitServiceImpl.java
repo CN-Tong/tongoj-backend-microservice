@@ -17,6 +17,7 @@ import com.tong.tongojbackendmodel.model.enums.QuestionSubmitLanguageEnum;
 import com.tong.tongojbackendmodel.model.enums.QuestionSubmitStatusEnum;
 import com.tong.tongojbackendmodel.model.vo.QuestionSubmitVO;
 import com.tong.tongojbackendquestionservice.mapper.QuestionSubmitMapper;
+import com.tong.tongojbackendquestionservice.rabbitmq.MessageProducer;
 import com.tong.tongojbackendquestionservice.service.QuestionService;
 import com.tong.tongojbackendquestionservice.service.QuestionSubmitService;
 import com.tong.tongojbackendserviceclient.service.JudgeFeignClient;
@@ -49,6 +50,9 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Resource
     @Lazy
     private JudgeFeignClient judgeFeignClient;
+
+    @Resource
+    private MessageProducer messageProducer;
 
     /**
      * 提交题目
@@ -88,9 +92,12 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         }
         // 执行判题服务
         Long questionSubmitId = questionSubmit.getId();
-        CompletableFuture.runAsync(() -> {
-            judgeFeignClient.doJudge(questionSubmitId);
-        });
+        // 给RabbitMQ发送消息
+        messageProducer.sendMessage("code_exchange", "my_routingKey", String.valueOf(questionSubmitId));
+        // 异步远程调用（后续用RabbitMQ取代）
+        // CompletableFuture.runAsync(() -> {
+        //     judgeFeignClient.doJudge(questionSubmitId);
+        // });
         // 返回提交记录的id
         return questionSubmitId;
     }

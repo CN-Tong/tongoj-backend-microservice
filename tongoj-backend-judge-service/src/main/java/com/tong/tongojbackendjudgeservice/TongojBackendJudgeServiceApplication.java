@@ -1,5 +1,6 @@
 package com.tong.tongojbackendjudgeservice;
 
+import com.tong.tongojbackendjudgeservice.rabbitmq.InitRabbitMQ;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -17,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class TongojBackendJudgeServiceApplication {
 
     public static void main(String[] args) {
+        InitRabbitMQ.doInit();
         SpringApplication.run(TongojBackendJudgeServiceApplication.class, args);
     }
 
