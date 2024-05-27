@@ -4,7 +4,9 @@ package com.tong.tongojbackendjudgeservice.judge.strategy;
 import com.tong.tongojbackendmodel.model.codesandbox.JudgeInfo;
 import com.tong.tongojbackendmodel.model.dto.question.JudgeConfig;
 import com.tong.tongojbackendmodel.model.enums.JudgeInfoMessageEnum;
+import com.tong.tongojbackendserviceclient.service.QuestionFeignClient;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
 

@@ -22,6 +22,7 @@ import com.tong.tongojbackendquestionservice.service.QuestionService;
 import com.tong.tongojbackendquestionservice.service.QuestionSubmitService;
 import com.tong.tongojbackendserviceclient.service.JudgeFeignClient;
 import com.tong.tongojbackendserviceclient.service.UserFeignClient;
+import lombok.Synchronized;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
@@ -47,9 +48,9 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Resource
     private UserFeignClient userFeignClient;
 
-    @Resource
-    @Lazy
-    private JudgeFeignClient judgeFeignClient;
+    // @Resource
+    // @Lazy
+    // private JudgeFeignClient judgeFeignClient;
 
     @Resource
     private MessageProducer messageProducer;
@@ -62,6 +63,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
      * @return
      */
     @Override
+    @Synchronized
     public Long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser) {
         // 校验编程语言
         String language = questionSubmitAddRequest.getLanguage();
@@ -86,9 +88,16 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         // 设置初始状态
         questionSubmit.setStatus(QuestionSubmitStatusEnum.WAITING.getValue());
         questionSubmit.setJudgeInfo("{}");
+        // 提交题目
         boolean success = this.save(questionSubmit);
         if (!success) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "数据插入失败");
+        }
+        // 提交成功后，题目提交数+1
+        question.setSubmitNum(question.getSubmitNum() + 1);
+        boolean updateSuccess = questionService.updateById(question);
+        if (!updateSuccess) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "修改题目提交数失败");
         }
         // 执行判题服务
         Long questionSubmitId = questionSubmit.getId();

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class JudgeServiceImpl implements JudgeService{
+public class JudgeServiceImpl implements JudgeService {
 
     @Resource
     private QuestionFeignClient questionFeignClient;
@@ -38,16 +38,16 @@ public class JudgeServiceImpl implements JudgeService{
     public QuestionSubmit doJudge(long questionSubmitId) {
         // 1. 传入题目的提交 id，获取题目的信息、提交信息（代码，编程语言）
         QuestionSubmit questionSubmit = questionFeignClient.getQuestionSubmitById(questionSubmitId);
-        if(questionSubmit == null){
+        if (questionSubmit == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "提交信息不存在");
         }
         Long questionId = questionSubmit.getQuestionId();
         Question question = questionFeignClient.getQuestionById(questionId);
-        if(question == null){
+        if (question == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "题目不存在");
         }
         // 2. 如果题目提交状态不为等待中，就不用重复执行了
-        if(!QuestionSubmitStatusEnum.WAITING.getValue().equals(questionSubmit.getStatus())){
+        if (!QuestionSubmitStatusEnum.WAITING.getValue().equals(questionSubmit.getStatus())) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "题目正在判题中");
         }
         // 3. 更改题目提交的状态为“判题中”，防止重复执行，也能让用户即时看到状态
@@ -57,7 +57,7 @@ public class JudgeServiceImpl implements JudgeService{
         //         .eq(QuestionSubmit::getId, questionSubmit.getId())
         //         .set(QuestionSubmit::getStatus, QuestionSubmitStatusEnum.RUNNING.getValue())
         //         .update();
-        if(!updateSuccess){
+        if (!updateSuccess) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新失败");
         }
         // 4. 调用沙箱，获取执行结果
@@ -78,15 +78,15 @@ public class JudgeServiceImpl implements JudgeService{
         // 5. 根据沙箱的判题结果，设置题目的判题状态和信息
         JudgeInfo judgeInfo = new JudgeInfo();
         // 5.1 判断是否编译错误
-        if(ExecuteCodeRespStatusEnum.COMPILE_ERROR.getValue().equals(executeCodeResponse.getStatus())){
+        if (ExecuteCodeRespStatusEnum.COMPILE_ERROR.getValue().equals(executeCodeResponse.getStatus())) {
             judgeInfo.setMessage(JudgeInfoMessageEnum.COMPILE_ERROR.getValue());
         }
         // 5.2 判断是否运行错误
-        if(ExecuteCodeRespStatusEnum.RUN_ERROR.getValue().equals(executeCodeResponse.getStatus())){
+        if (ExecuteCodeRespStatusEnum.RUN_ERROR.getValue().equals(executeCodeResponse.getStatus())) {
             judgeInfo.setMessage(JudgeInfoMessageEnum.RUN_ERROR.getValue());
         }
         // 5.3 如果没有编译错误/运行错误，则对执行结果进行判断
-        if(ExecuteCodeRespStatusEnum.SUCCESS.getValue().equals(executeCodeResponse.getStatus())){
+        if (ExecuteCodeRespStatusEnum.SUCCESS.getValue().equals(executeCodeResponse.getStatus())) {
             // 创建判题上下文
             JudgeContext judgeContext = new JudgeContext();
             String judgeConfigStr = question.getJudgeConfig();
@@ -109,8 +109,16 @@ public class JudgeServiceImpl implements JudgeService{
         //         .set(QuestionSubmit::getStatus, QuestionSubmitStatusEnum.SUCCESS.getValue())
         //         .set(QuestionSubmit::getJudgeInfo, JSONUtil.toJsonStr(judgeInfo))
         //         .update();
-        if(!success){
+        if (!success) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "判题结果更新失败");
+        }
+        if(JudgeInfoMessageEnum.ACCEPTED.getValue().equals(judgeInfo.getMessage())){
+            // 判题结果为ac时，题目通过数+1
+            question.setAcceptedNum(question.getAcceptedNum() + 1);
+            boolean updateAcNumSuccess = questionFeignClient.updateQuestionById(question);
+            if (!updateAcNumSuccess) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目通过数更新失败");
+            }
         }
         // 7. 返回结果
         return questionFeignClient.getQuestionSubmitById(questionSubmitId);
