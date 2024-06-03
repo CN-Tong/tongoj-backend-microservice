@@ -75,3 +75,7 @@ knife4j:
 # 代码沙箱配置
 codesandbox:
   type: docker
+client:
+  codesandbox:
+    access-key: 5e4da60b5c2f3e90a2b92bcabbf99947
+    secret-key: c46c8de273d56a199adbc8a605de97af

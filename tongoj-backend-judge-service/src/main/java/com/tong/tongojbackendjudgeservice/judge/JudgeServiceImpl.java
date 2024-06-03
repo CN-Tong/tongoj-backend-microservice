@@ -18,6 +18,7 @@ import com.tong.tongojbackendmodel.model.enums.ExecuteCodeRespStatusEnum;
 import com.tong.tongojbackendmodel.model.enums.JudgeInfoMessageEnum;
 import com.tong.tongojbackendmodel.model.enums.QuestionSubmitStatusEnum;
 import com.tong.tongojbackendserviceclient.service.QuestionFeignClient;
+import com.tong.tongojcodesandboxsdk.client.CodeSandboxClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +32,11 @@ public class JudgeServiceImpl implements JudgeService {
     @Resource
     private QuestionFeignClient questionFeignClient;
 
-    @Value("${codesandbox.type:example}")
+    @Value("${codesandbox.type:docker}")
     private String type;
+
+    @Resource
+    private CodeSandboxClient codeSandboxClient;
 
     @Override
     public QuestionSubmit doJudge(long questionSubmitId) {
@@ -74,7 +78,7 @@ public class JudgeServiceImpl implements JudgeService {
                 .code(code)
                 .inputList(inputList)
                 .build();
-        ExecuteCodeResponse executeCodeResponse = codeSandboxProxy.executeCode(executeCodeRequest);
+        ExecuteCodeResponse executeCodeResponse = codeSandboxProxy.executeCode(executeCodeRequest, codeSandboxClient);
         // 5. 根据沙箱的判题结果，设置题目的判题状态和信息
         JudgeInfo judgeInfo = new JudgeInfo();
         // 5.1 判断是否编译错误

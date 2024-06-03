@@ -2,7 +2,6 @@ package com.tong.tongojbackendjudgeservice.judge.codesandbox;
 
 
 import com.tong.tongojbackendjudgeservice.judge.codesandbox.impl.DockerCodeSandbox;
-import com.tong.tongojbackendjudgeservice.judge.codesandbox.impl.ExampleCodeSandbox;
 import com.tong.tongojbackendjudgeservice.judge.codesandbox.impl.JavaNativeCodeSandbox;
 
 /**
@@ -17,14 +16,12 @@ public class CodeSandboxFactory {
      */
     public static CodeSandbox newInstance(String type){
         switch (type){
-            case "example":
-                return new ExampleCodeSandbox();
             case "java native":
                 return new JavaNativeCodeSandbox();
             case "docker":
                 return new DockerCodeSandbox();
             default:
-                return new ExampleCodeSandbox();
+                return new DockerCodeSandbox();
         }
     }
 }
