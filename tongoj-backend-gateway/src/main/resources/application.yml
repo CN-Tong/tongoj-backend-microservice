@@ -18,6 +18,10 @@ spring:
           uri: lb://tongoj-backend-judge-service
           predicates:
             - Path=/api/judge/**
+        - id: code-sandbox
+          uri: http://47.94.14.69:8090
+          predicates:
+            - Path=/executeCode/**
   main:
     web-application-type: reactive
 server:

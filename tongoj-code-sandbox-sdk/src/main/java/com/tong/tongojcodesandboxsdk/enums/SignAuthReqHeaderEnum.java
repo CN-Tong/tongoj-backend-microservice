@@ -1,4 +1,4 @@
-package com.tong.tongojbackendmodel.model.enums;
+package com.tong.tongojcodesandboxsdk.enums;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -7,18 +7,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 文件上传业务类型枚举
+ * API签名认证请求头枚举
  * @author Tong
  */
-public enum FileUploadBizEnum {
+public enum SignAuthReqHeaderEnum {
 
-    USER_AVATAR("用户头像", "user_avatar");
+    ACCESS_KEY("通行证账号", "accessKey"),
+    TIMESTAMP("时间戳", "timestamp"),
+    BODY("内容", "body"),
+    SIGN("签名", "sign");
 
     private final String text;
 
     private final String value;
 
-    FileUploadBizEnum(String text, String value) {
+    SignAuthReqHeaderEnum(String text, String value) {
         this.text = text;
         this.value = value;
     }
@@ -38,11 +41,11 @@ public enum FileUploadBizEnum {
      * @param value
      * @return
      */
-    public static FileUploadBizEnum getEnumByValue(String value) {
+    public static SignAuthReqHeaderEnum getEnumByValue(String value) {
         if (ObjectUtils.isEmpty(value)) {
             return null;
         }
-        for (FileUploadBizEnum anEnum : FileUploadBizEnum.values()) {
+        for (SignAuthReqHeaderEnum anEnum : SignAuthReqHeaderEnum.values()) {
             if (anEnum.value.equals(value)) {
                 return anEnum;
             }

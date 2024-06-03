@@ -1,6 +1,7 @@
 package com.tong.tongojcodesandboxsdk.client;
 
 import cn.hutool.http.HttpRequest;
+import com.tong.tongojcodesandboxsdk.enums.SignAuthReqHeaderEnum;
 import com.tong.tongojcodesandboxsdk.utils.SignUtils;
 import lombok.Data;
 
@@ -16,7 +17,8 @@ public class CodeSandboxClient {
     private String accessKey;
     private String secretKey;
 
-    private final String INTERFACE_PREFIX = "http://47.94.14.69:8090";
+    // private final String INTERFACE_PREFIX = "http://47.94.14.69:8090";
+    private final String INTERFACE_PREFIX = "http://localhost:8101";
 
     public CodeSandboxClient(String accessKey, String secretKey) {
         this.accessKey = accessKey;
@@ -62,10 +64,10 @@ public class CodeSandboxClient {
      */
     private Map<String, String> getHeaderMap(String body){
         HashMap<String, String> hashMap = new HashMap();
-        hashMap.put("accessKey", accessKey);
-        hashMap.put("body", body);
-        hashMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
-        hashMap.put("sign", SignUtils.getSign(body, secretKey));
+        hashMap.put(SignAuthReqHeaderEnum.ACCESS_KEY.getValue(), accessKey);
+        hashMap.put(SignAuthReqHeaderEnum.BODY.getValue(), body);
+        hashMap.put(SignAuthReqHeaderEnum.TIMESTAMP.getValue(), String.valueOf(System.currentTimeMillis()));
+        hashMap.put(SignAuthReqHeaderEnum.SIGN.getValue(), SignUtils.getSign(body, secretKey));
         return hashMap;
     }
 

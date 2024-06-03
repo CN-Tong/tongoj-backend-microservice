@@ -20,6 +20,12 @@ public class UserInnerController implements UserFeignClient {
     private UserService userService;
 
     @Override
+    @GetMapping("/get/ak")
+    public User getByAk(String accessKey) {
+        return userService.lambdaQuery().eq(User::getAccessKey, accessKey).one();
+    }
+
+    @Override
     @GetMapping("/get/id")
     public User getById(@RequestParam("userId") long userId) {
         return userService.getById(userId);

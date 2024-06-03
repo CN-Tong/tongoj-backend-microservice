@@ -67,6 +67,3 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - com.tong.tongojbackenduserservice.controller
-# 代码沙箱配置
-codesandbox:
-  type: docker

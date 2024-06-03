@@ -24,6 +24,9 @@ import static com.tong.tongojbackendcommon.constant.UserConstant.USER_LOGIN_STAT
 @FeignClient(name = "tongoj-backend-user-service", path = "/api/user/inner")
 public interface UserFeignClient {
 
+    @GetMapping("/get/ak")
+    User getByAk(@RequestParam("accessKey") String accessKey);
+
     /**
      * 根据id获取user
      * @param userId
